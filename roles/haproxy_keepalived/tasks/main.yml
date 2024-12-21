@@ -8,12 +8,28 @@
       - keepalived
     state: present
 
+    
+
 # copy haproxy configuration file to /etc/haproxy/haproxy.cfg
 - name: Copy haproxy configuration file
   become: true
   template:
     src: haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
+  notify:
+    - Restart haproxy
+
+- name: Ensure directory exists
+  become: true
+  file:
+    path:  /etc/haproxy/certs/cloudnativeapps.in.pem
+    state: directory
+
+- name: Copy certificates from local to remote
+  become: true
+  copy:
+    src:  /tmp/ssl/certs/cloudnativeapps.in.pem
+    dest: /etc/haproxy/certs/cloudnativeapps.in.pem
   notify:
     - Restart haproxy
 

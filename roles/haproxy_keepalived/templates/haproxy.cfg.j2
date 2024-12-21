@@ -1,11 +1,10 @@
 frontend web
-    bind 0.0.0.0:443
+    bind *:443 ssl crt /etc/haproxy/certs/cloudnativeapps.in.pem
     default_backend minio_servers
-
 backend minio_servers
     balance roundrobin
     option httpchk HEAD /minio/health/ready
     default-server check
     {% for server in minio_servers %}
-        server {{ server.name }} {{ server.ip }}:9091 check
+      server {{ server.name }} {{ server.ip }}:9091 check
     {% endfor %}
