@@ -1,0 +1,13 @@
+---
+# defaults file for minio_ssl
+    # SSL Certificate Common Name
+    cert_common_name: cloudnativeapps.in
+    # SSL Certificate Subject Alternative Name (SAN)
+    cert_subject_alt_name:
+      - "DNS:*.cloudnativeapps.in"
+      - "DNS:*.minio.cloudnativeapps.in"
+    # Keep in-line of modern cert expiry requirement - 13 months max
+    ownca_not_after: "+397d"
+    # Allow custom CA name, Organisation (shows up nicely in certificate mangers)
+    openssl_csr_common_name: "Self-Signed CA"
+    openssl_csr_organization_name: "Self-Signed Organisation"

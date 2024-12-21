@@ -1,0 +1,16 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Delete directory
+      file:
+        path: /tmp/ssl/
+        state: absent
+
+- hosts: localhost
+  name: certs
+  tasks:
+    - name: certs
+      include_role:
+        name: minio_ssl

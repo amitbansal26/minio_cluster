@@ -1,2 +1,3 @@
 ---
-# defaults file for minio
+minio_group: minio
+minio_user: minio

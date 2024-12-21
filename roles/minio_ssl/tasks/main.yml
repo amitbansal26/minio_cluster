@@ -1,0 +1,64 @@
+---
+# tasks file for minio_ssl\
+- name: Create local directories
+  file:
+    state: directory
+    path: "{{item}}"
+  with_items:
+    - /tmp/ssl/keys/
+    - /tmp/ssl/csrs/
+    - /tmp/ssl/certs/
+
+- name: Generate Root CA private key
+  community.crypto.openssl_privatekey:
+    path: "/tmp/ssl/keys/ca.key"
+
+- name: Generate Root CA CSR
+  community.crypto.openssl_csr:
+    path: "/tmp/ssl/csrs/ca.csr"
+    privatekey_path: "/tmp/ssl/keys/ca.key"
+    common_name: "Self-Signed CA"
+    organization_name: "Self-Signed Organisation"
+    basic_constraints:
+      - CA:TRUE
+    basic_constraints_critical: true
+    key_usage:
+      - keyCertSign
+      - digitalSignature
+      - cRLSign
+    key_usage_critical: true    
+
+- name: Generate ROOT CA Certificate
+  ansible.builtin.openssl_certificate:
+    path: "/tmp/ssl/certs/ca.crt"
+    privatekey_path: "/tmp/ssl/keys/ca.key"
+    csr_path: "/tmp/ssl/csrs/ca.csr"
+    provider: selfsigned
+
+- name: Generate private key for site
+  community.crypto.openssl_privatekey:
+    path: "/tmp/ssl/keys/{{ cert_common_name }}.key"
+
+- name: Generate CSR for site
+  community.crypto.openssl_csr:
+    path: "/tmp/ssl/csrs/{{cert_common_name}}.csr"
+    privatekey_path: "/tmp/ssl/keys/{{cert_common_name}}.key"
+    common_name: "{{cert_common_name}}"
+    organization_name: "{{openssl_csr_organization_name}}"
+    subject_alt_name: "{{cert_subject_alt_name}}"
+
+- name : Generate domain certificate
+  ansible.builtin.openssl_certificate:
+    path: "/tmp/ssl/certs/{{cert_common_name}}.hostonly.crt"
+    csr_path: "/tmp/ssl/csrs/{{cert_common_name}}.csr"
+    ownca_path: "/tmp/ssl/certs/ca.crt"
+    ownca_privatekey_path: "/tmp/ssl/keys/ca.key"
+    ownca_not_after: "{{ownca_not_after}}"
+    provider: ownca
+
+- name: Generate DC with FCT
+  ansible.builtin.copy:
+    content: "{{    lookup('file', '/tmp/ssl/certs/{{cert_common_name}}.hostonly.crt') + '\n' + 
+                    lookup('file','/tmp/ssl/certs/ca.crt')+'\n'
+              }}"
+    dest: "/tmp/ssl/certs/{{cert_common_name}}.crt"
