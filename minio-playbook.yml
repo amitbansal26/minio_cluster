@@ -1,0 +1,7 @@
+---
+- hosts: minio-nodes
+  name: minio install
+  tasks:
+    - name: minio install
+      include_role:
+        name: minio

@@ -8,8 +8,6 @@
       - keepalived
     state: present
 
-    
-
 # copy haproxy configuration file to /etc/haproxy/haproxy.cfg
 - name: Copy haproxy configuration file
   become: true
@@ -64,3 +62,13 @@
     name: keepalived
     state: started
     enabled: true
+
+- name: Update /etc/hosts
+  become: true
+  blockinfile:
+      path: /etc/hosts
+      create: yes
+      block: |
+        {% for item in groups['minio-nodes'] %}
+        {{ hostvars[item].ansible_host }}    {{ item }}.cloudnativeapps.in    
+        {% endfor %}

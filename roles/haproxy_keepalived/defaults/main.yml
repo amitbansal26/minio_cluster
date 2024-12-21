@@ -1,13 +1,13 @@
 ---
 # defaults file for haproxy_keepalived
 minio_servers:
-  - name: minio1
+  - name: minio1.cloudnativeapps.in
     ip: 172.16.16.101
-  - name: minio2
+  - name: minio2.cloudnativeapps.in
     ip: 172.16.16.102
-  - name: minio3
+  - name: minio3.cloudnativeapps.in
     ip: 172.16.16.103
-  - name: minio4
+  - name: minio4.cloudnativeapps.in
     ip: 172.16.16.104
 proxy1: 172.16.16.51
 proxy2: 172.16.16.52    
