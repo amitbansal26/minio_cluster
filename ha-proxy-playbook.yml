@@ -1,0 +1,7 @@
+---
+- hosts: haproxy-nodes
+  name: haproxy install
+  tasks:
+    - name: haproxy install
+      include_role:
+        name: haproxy_keepalived

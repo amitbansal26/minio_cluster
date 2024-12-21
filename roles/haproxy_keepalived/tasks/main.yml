@@ -1,0 +1,50 @@
+---
+# tasks file for haproxy_keepalived
+- name: Install haproxy and keepalived
+  become: true
+  package:
+    name: 
+      - haproxy
+      - keepalived
+    state: present
+
+# copy haproxy configuration file to /etc/haproxy/haproxy.cfg
+- name: Copy haproxy configuration file
+  become: true
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify:
+    - Restart haproxy
+
+- name: Ensure haproxy is started and enabled
+  become: true
+  service:
+    name: haproxy
+    state: started
+    enabled: true
+
+- name: Copy first keepalived configuration file
+  become: true
+  template:
+    src: keepalived1.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  delegate_to: "{{ groups['haproxy-nodes'][0] }}"
+  notify:
+    - Restart keepalived
+
+- name: Copy second keepalived configuration file
+  become: true
+  template:
+    src: keepalived2.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  delegate_to: "{{ groups['haproxy-nodes'][1] }}"
+  notify:
+    - Restart keepalived
+
+- name: Ensure keepalived is started and enabled
+  become: true
+  service:
+    name: keepalived
+    state: started
+    enabled: true
